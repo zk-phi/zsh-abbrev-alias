@@ -41,6 +41,10 @@ __abbrev_alias::magic_abbrev_expand() {
   local abbr=${_abbrev_aliases[$MATCH]}
   local kind=${${(s.\0.)abbr}[1]}
   local newbuffer=${${(s.\0.)abbr}[2]:-$MATCH}
+  if [[ $abbr == "" ]]; then
+    LBUFFER+=$newbuffer
+    return 1
+  fi
   if [[ $kind == "c" && ! ( $LBUFFER == "" || $LBUFFER =~ "(\\||;|&|\\$\\(|\`) ?$" ) ]]; then
     newbuffer=$MATCH
   else
@@ -61,6 +65,13 @@ __abbrev_alias::magic_abbrev_expand_and_insert() {
     zle self-insert
 }
 
+__abbrev_alias::magic_abbrev_expand_or_insert() {
+    zle __abbrev_alias::magic_abbrev_expand
+    if [[ $? == 1 ]]; then
+      zle self-insert
+    fi
+}
+
 __abbrev_alias::magic_abbrev_expand_and_accept_line() {
     zle __abbrev_alias::magic_abbrev_expand
     zle accept-line
@@ -74,6 +85,7 @@ __abbrev_alias::init() {
   zle -N __abbrev_alias::magic_abbrev_expand
   zle -N __abbrev_alias::no_magic_abbrev_expand
   zle -N __abbrev_alias::magic_abbrev_expand_and_insert
+  zle -N __abbrev_alias::magic_abbrev_expand_or_insert
   zle -N __abbrev_alias::magic_abbrev_expand_and_accept_line
   bindkey " "    __abbrev_alias::magic_abbrev_expand_and_insert
   bindkey "^M"   __abbrev_alias::magic_abbrev_expand_and_accept_line
