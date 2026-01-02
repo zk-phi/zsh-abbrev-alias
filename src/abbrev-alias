@@ -65,6 +65,7 @@ __abbrev_alias::magic_abbrev_expand_and_insert() {
     zle self-insert
 }
 
+# Try to expand abbrev. Then self-insert IFF not expanded.
 __abbrev_alias::magic_abbrev_expand_or_insert() {
     zle __abbrev_alias::magic_abbrev_expand
     if [[ $? == 1 ]]; then
